@@ -1,5 +1,6 @@
 /**
  *  Z-Wave Garage Door Opener
+ *  Z-Wave Garage Door Opener Modified for GD00Z by @Garyd, Copied and modifed by @Ron
  *
  *  Copyright 2014 SmartThings
  *
@@ -14,16 +15,19 @@
  *
  */
 metadata {
-	definition (name: "My Z-Wave Garage Door Opener", namespace: "smartthings", author: "SmartThings") {
+	definition (name: "Z-Wave Garage Door Opener", namespace: "smartthings", author: "SmartThings") {
+	definition (name: "RG Linear GD00Z Garage Door Opener", namespace: "gouldner", author: "Ronald Gouldner") {
 		capability "Actuator"
 		capability "Door Control"
 		capability "Contact Sensor"
 		capability "Refresh"
 		capability "Sensor"
+        /* RRG Add capabilities START */
         capability "Polling"
   		capability "Switch" 
 		capability "Momentary"
 		capability "Relay Switch"
+        /* RRG Add capabilities END */
 
 
 		fingerprint deviceId: "0x4007", inClusters: "0x98"
@@ -59,11 +63,11 @@ metadata {
 		standardTile("refresh", "device.door", inactiveLabel: false, decoration: "flat") {
 			state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
 		}
+
 		main "toggle"
 		details(["toggle", "open", "close", "refresh"])
 	}
 }
-
 
 import physicalgraph.zwave.commands.barrieroperatorv1.*
 
@@ -115,12 +119,14 @@ def zwaveEvent(physicalgraph.zwave.commands.securityv1.SecurityCommandsSupported
 def zwaveEvent(BarrierOperatorReport cmd) {
 	def result = []
 	def map = [ name: "door" ]
+    /* RRG Add switch Map */
     def switchMap = [ name: "switch" ]
     
 	switch (cmd.barrierState) {
 		case BarrierOperatorReport.BARRIER_STATE_CLOSED:
 			map.value = "closed"
 			result << createEvent(name: "contact", value: "closed", displayed: false)
+            /* RRG Add switch event */
             result << createEvent(name: "switch", value: "off", displayed: false)
 			break
 		case BarrierOperatorReport.BARRIER_STATE_UNKNOWN_POSITION_MOVING_TO_CLOSE:
@@ -137,6 +143,7 @@ def zwaveEvent(BarrierOperatorReport cmd) {
 		case BarrierOperatorReport.BARRIER_STATE_OPEN:
 			map.value = "open"
 			result << createEvent(name: "contact", value: "open", displayed: false)
+            /* RRG Add Switch Event */
             result << createEvent(name: "switch", value: "on", displayed: false)
 			break
 	}
@@ -295,11 +302,11 @@ def close() {
 	secure(zwave.barrierOperatorV1.barrierOperatorSet(requestedBarrierState: BarrierOperatorSet.REQUESTED_BARRIER_STATE_CLOSE))
 }
 
-
 def refresh() {
 	secure(zwave.barrierOperatorV1.barrierOperatorGet())
 }
 
+/* RRG Add Methods START */
 def poll() {
 	secure(zwave.barrierOperatorV1.barrierOperatorGet())
 }
@@ -334,7 +341,7 @@ def push() {
     }
     
 }
-
+/* RRG Add Methods End */
 
 
 private secure(physicalgraph.zwave.Command cmd) {
