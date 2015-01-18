@@ -15,19 +15,18 @@
  *
  */
 metadata {
-	definition (name: "Z-Wave Garage Door Opener", namespace: "smartthings", author: "SmartThings") {
 	definition (name: "RG Linear GD00Z Garage Door Opener", namespace: "gouldner", author: "Ronald Gouldner") {
 		capability "Actuator"
 		capability "Door Control"
 		capability "Contact Sensor"
 		capability "Refresh"
 		capability "Sensor"
-        /* RRG Add capabilities START */
+        /* RRG Gary Add capabilities START */
         capability "Polling"
   		capability "Switch" 
 		capability "Momentary"
 		capability "Relay Switch"
-        /* RRG Add capabilities END */
+        /* RRG Gary Add capabilities END */
 
 
 		fingerprint deviceId: "0x4007", inClusters: "0x98"
@@ -119,15 +118,15 @@ def zwaveEvent(physicalgraph.zwave.commands.securityv1.SecurityCommandsSupported
 def zwaveEvent(BarrierOperatorReport cmd) {
 	def result = []
 	def map = [ name: "door" ]
-    /* RRG Add switch Map */
+    /* Gary RRG Add switch Map */
     def switchMap = [ name: "switch" ]
     
 	switch (cmd.barrierState) {
 		case BarrierOperatorReport.BARRIER_STATE_CLOSED:
 			map.value = "closed"
 			result << createEvent(name: "contact", value: "closed", displayed: false)
-            /* RRG Add switch event */
-            result << createEvent(name: "switch", value: "off", displayed: false)
+                        /* RRG Gary Add switch event */
+                        result << createEvent(name: "switch", value: "off", displayed: false)
 			break
 		case BarrierOperatorReport.BARRIER_STATE_UNKNOWN_POSITION_MOVING_TO_CLOSE:
 			map.value = "closing"
@@ -143,8 +142,8 @@ def zwaveEvent(BarrierOperatorReport cmd) {
 		case BarrierOperatorReport.BARRIER_STATE_OPEN:
 			map.value = "open"
 			result << createEvent(name: "contact", value: "open", displayed: false)
-            /* RRG Add Switch Event */
-            result << createEvent(name: "switch", value: "on", displayed: false)
+                        /* RRG Gary Add Switch Event */
+                        result << createEvent(name: "switch", value: "on", displayed: false)
 			break
 	}
 	result + createEvent(map)
@@ -306,7 +305,7 @@ def refresh() {
 	secure(zwave.barrierOperatorV1.barrierOperatorGet())
 }
 
-/* RRG Add Methods START */
+/* RRG Gary Add Methods START */
 def poll() {
 	secure(zwave.barrierOperatorV1.barrierOperatorGet())
 }
@@ -341,7 +340,7 @@ def push() {
     }
     
 }
-/* RRG Add Methods End */
+/* RRG Gary Add Methods End */
 
 
 private secure(physicalgraph.zwave.Command cmd) {
